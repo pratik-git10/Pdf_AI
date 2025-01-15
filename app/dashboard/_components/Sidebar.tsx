@@ -9,8 +9,8 @@ const Sidebar = () => {
   return (
     <div className="shadow-sm shadow-black h-screen px-4 py-2 ml-2 mr-2 rounded-md">
       <Link href="/dashboard">
-        <h2 className="text-xl font-extrabold text-blue-400 flex justify-center items-center">
-          BindingAI
+        <h2 className="text-2xl font-extrabold text-red-400 flex justify-center items-center">
+          PdfAI
         </h2>
       </Link>
       <div className="mt-5">
@@ -24,12 +24,12 @@ const Sidebar = () => {
           <Layout />
           <h2>Workspace</h2>
         </div>
-        <div className="flex gap-2 items-center p-2 mt-2 hover:bg-slate-400 rounded-md cursor-pointer transition-all">
+      </div>
+      <div className="absolute bottom-8 w-[80%]">
+        <div className="flex gap-2 items-center p-2 mt-2 bg-neutral-200 hover:bg-neutral-400 rounded-md cursor-pointer transition-all mb-4">
           <Shield />
           <h2>Upgrade</h2>
         </div>
-      </div>
-      <div className="absolute bottom-8 w-[80%]">
         <Progress value={40} />
         <h2 className="text-sm mt-1">2 out of 5 pdf uploaded</h2>
         <p className="mt-2 text-sm text-blue-800">Upgrade to Upload More Pdf</p>

@@ -1,10 +1,30 @@
-import { UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import React from "react";
+import { Button } from "./ui/button";
+import Link from "next/link";
 
-const Navbar = () => {
+interface NavbarProps {
+  showLinkOnSmallDevices: boolean;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ showLinkOnSmallDevices }) => {
   return (
-    <div className="flex justify-end items-center rounded-md border p-2 shadow-sm shadow-black ">
-      <UserButton />
+    <div className="flex justify-between items-center rounded-md border p-2 shadow-sm shadow-black ">
+      <Link href="/">
+        <h2
+          className={`text-2xl font-extrabold text-red-400 ${showLinkOnSmallDevices ? "block" : "md:hidden"}`}>
+          PdfAI
+        </h2>
+      </Link>
+
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+      <SignedOut>
+        <Link href="/sign-in">
+          <Button>Login</Button>
+        </Link>
+      </SignedOut>
     </div>
   );
 };
