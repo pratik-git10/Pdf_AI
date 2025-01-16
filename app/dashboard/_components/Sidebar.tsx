@@ -7,12 +7,11 @@ import Link from "next/link";
 
 const Sidebar = () => {
   return (
-    <div className="shadow-sm shadow-black h-screen px-4 py-2 ml-2 mr-2 rounded-md">
-      <Link href="/dashboard">
-        <h2 className="text-2xl font-extrabold text-red-400 flex justify-center items-center">
-          PdfAI
-        </h2>
-      </Link>
+    <div className="shadow-md shadow-black h-screen px-4 py-2 ml-2 mr-2 rounded-md border-t">
+      <h2 className="text-2xl font-extrabold text-red-400 flex justify-center items-center">
+        <Link href="/dashboard">PdfAI</Link>
+      </h2>
+
       <div className="mt-5">
         <UploadPdf>
           <Button variant="outline" className="w-full">

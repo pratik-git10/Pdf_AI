@@ -30,7 +30,7 @@ export default function Home() {
     <div className="">
       <div className="my-2 mx-10 fixed inset-x-1 bg--500">
         <Navbar showLinkOnSmallDevices={true} />
-        <div className="flex justify-center items-center bg--400 mt-20 px-2 flex-col ">
+        <div className="flex justify-center items-center bg--400 mt-20 px-2 flex-col text-center">
           <h1 className="text-xl md:text-4xl">
             Welcome to{" "}
             <span className="font-extrabold text-xl md:text-4xl text-red-400">
