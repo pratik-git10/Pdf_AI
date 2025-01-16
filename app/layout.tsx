@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "react-hot-toast";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -28,7 +29,10 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`antialiased`}>
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <ConvexClientProvider>
+            {children}
+            <Toaster position="bottom-right" />
+          </ConvexClientProvider>
         </body>
       </html>
     </ClerkProvider>

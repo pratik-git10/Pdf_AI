@@ -3,30 +3,42 @@ import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
 
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 
-const pdfUrl =
-  "https://neat-porcupine-165.convex.cloud/api/storage/10bdc1d1-2c25-4be2-931a-05bac8e948aa";
 export async function GET(req: Request) {
-  const response = await fetch(pdfUrl);
-  const data = await response.blob();
-  const loader = new WebPDFLoader(data);
-  const docs = await loader.load();
+  const reqUrl = req.url;
+  const { searchParams } = new URL(reqUrl);
+  const pdfUrl = searchParams.get("pdfUrl");
+  console.log("pdfurl", pdfUrl);
 
-  let pdfTextContent = "";
-  docs.forEach((doc) => {
-    pdfTextContent = pdfTextContent + doc.pageContent;
-  });
+  if (!pdfUrl) {
+    console.error("pdfUrl is missing");
+    // Handle the error, e.g., return an error response or throw an error
+    throw new Error("url is missing");
+  } else {
+    console.log("pdfurl", pdfUrl);
+    const response = await fetch(pdfUrl);
+    // Continue with processing the response
 
-  const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 100,
-    chunkOverlap: 20,
-  });
+    const data = await response.blob();
+    const loader = new WebPDFLoader(data);
+    const docs = await loader.load();
 
-  const output = await splitter.createDocuments([pdfTextContent]);
+    let pdfTextContent = "";
+    docs.forEach((doc) => {
+      pdfTextContent = pdfTextContent + doc.pageContent;
+    });
 
-  let splitterList: string[] = [];
-  output.forEach((doc) => {
-    splitterList.push(doc.pageContent);
-  });
+    const splitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 100,
+      chunkOverlap: 20,
+    });
 
-  return NextResponse.json({ result: splitterList });
+    const output = await splitter.createDocuments([pdfTextContent]);
+
+    let splitterList: string[] = [];
+    output.forEach((doc) => {
+      splitterList.push(doc.pageContent);
+    });
+
+    return NextResponse.json({ result: splitterList });
+  }
 }

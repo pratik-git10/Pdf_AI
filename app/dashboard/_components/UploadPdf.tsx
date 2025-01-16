@@ -14,11 +14,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader, Upload } from "lucide-react";
-import { useMutation } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { AddFileEntryToDb } from "@/convex/messages";
 import uuid4 from "uuid4";
 import { useUser } from "@clerk/nextjs";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 interface UploadPdfProps {
   children: ReactNode;
@@ -30,11 +32,14 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
 
   const getFileUrl = useMutation(api.messages.getFilrUrl);
 
+  const embeddDocument = useAction(api.myActions.ingest);
+
   const user = useUser();
 
   const [file, setFile] = useState<File | null>();
   const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState<string | undefined>();
+  const [open, setOpen] = useState(false);
 
   const onFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -44,10 +49,10 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
 
   const onUpload = async () => {
     setLoading(true);
-    // Step 1: Get a short-lived upload URL
+    // // Step 1: Get a short-lived upload URL
     const postUrl = await generateUploadUrl();
 
-    // Step 2: POST the file to the URL
+    // // Step 2: POST the file to the URL
     const result = await fetch(postUrl, {
       method: "POST",
       headers: { "Content-Type": file?.type! },
@@ -58,7 +63,7 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
     const fileId = uuid4();
     const fileUrl =
       (await getFileUrl({ storageId: storageId })) ?? "defaultFileUrl";
-    // Step 3: Save the newly allocated storage id to the database
+    // // Step 3: Save the newly allocated storage id to the database
     const resp = await insertFileEntry({
       fileId: fileId,
       storageId: storageId,
@@ -67,13 +72,31 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
       createdBy: user?.user?.primaryEmailAddress?.emailAddress || "unknown",
     });
     console.log(resp);
+
+    //api call
+    const apiResponse = await axios.get("/api/pdf-loader?pdfUrl=" + fileUrl);
+    console.log(apiResponse.data.result);
+    await embeddDocument({
+      splitText: apiResponse.data.result,
+      fileId: fileId,
+    });
+    // console.log(embeddedResult);
     setLoading(false);
+    setOpen(false);
+    toast.success("File Uploaded Successfully.");
   };
 
   return (
     <div>
-      <Dialog>
-        <DialogTrigger asChild>{children}</DialogTrigger>
+      <Dialog open={open}>
+        <DialogTrigger asChild>
+          <Button
+            onClick={() => setOpen(true)}
+            variant="outline"
+            className="w-full">
+            + Upload PDF file
+          </Button>
+        </DialogTrigger>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="">Upload PDF File</DialogTitle>
@@ -101,7 +124,10 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="secondary">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setOpen(false)}>
                 Cancel
               </Button>
             </DialogClose>
