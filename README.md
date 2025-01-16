@@ -9,9 +9,10 @@
 - Generated Quiz
 - Generated Flashcards
 
-### Tech stack
+### Tech stack and Tools
 
 - Nextjs 15
 - Convex as database
 - Tailwind Css
+- Langchain
 - Shadcn ui
