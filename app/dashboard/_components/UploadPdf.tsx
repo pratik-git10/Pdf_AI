@@ -49,41 +49,47 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
 
   const onUpload = async () => {
     setLoading(true);
-    // // Step 1: Get a short-lived upload URL
-    const postUrl = await generateUploadUrl();
+    try {
+      // // Step 1: Get a short-lived upload URL
+      const postUrl = await generateUploadUrl();
 
-    // // Step 2: POST the file to the URL
-    const result = await fetch(postUrl, {
-      method: "POST",
-      headers: { "Content-Type": file?.type! },
-      body: file,
-    });
-    const { storageId } = await result.json();
-    console.log("storageid", storageId);
-    const fileId = uuid4();
-    const fileUrl =
-      (await getFileUrl({ storageId: storageId })) ?? "defaultFileUrl";
-    // // Step 3: Save the newly allocated storage id to the database
-    const resp = await insertFileEntry({
-      fileId: fileId,
-      storageId: storageId,
-      fileName: fileName ?? "Untitle",
-      fileUrl: fileUrl,
-      createdBy: user?.user?.primaryEmailAddress?.emailAddress || "unknown",
-    });
-    console.log(resp);
+      // // Step 2: POST the file to the URL
+      const result = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": file?.type! },
+        body: file,
+      });
+      const { storageId } = await result.json();
+      console.log("storageid", storageId);
+      const fileId = uuid4();
+      const fileUrl =
+        (await getFileUrl({ storageId: storageId })) ?? "defaultFileUrl";
+      // // Step 3: Save the newly allocated storage id to the database
+      const resp = await insertFileEntry({
+        fileId: fileId,
+        storageId: storageId,
+        fileName: fileName ?? "Untitle",
+        fileUrl: fileUrl,
+        createdBy: user?.user?.primaryEmailAddress?.emailAddress || "unknown",
+      });
+      console.log(resp);
 
-    //api call
-    const apiResponse = await axios.get("/api/pdf-loader?pdfUrl=" + fileUrl);
-    console.log(apiResponse.data.result);
-    await embeddDocument({
-      splitText: apiResponse.data.result,
-      fileId: fileId,
-    });
-    // console.log(embeddedResult);
-    setLoading(false);
-    setOpen(false);
-    toast.success("File Uploaded Successfully.");
+      //api call
+      const apiResponse = await axios.get("/api/pdf-loader?pdfUrl=" + fileUrl);
+      console.log(apiResponse.data.result);
+      await embeddDocument({
+        splitText: apiResponse.data.result,
+        fileId: fileId,
+      });
+      // console.log(embeddedResult);
+      setLoading(false);
+      setOpen(false);
+      toast.success("File Uploaded Successfully.");
+    } catch (error) {
+      toast.error("Error while Uploading");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

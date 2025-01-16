@@ -21,7 +21,9 @@ const Sidebar = () => {
 
         <div className="flex gap-2 items-center mt-5 p-2 hover:bg-slate-400 rounded-md cursor-pointer transition-all">
           <Layout />
-          <h2>Workspace</h2>
+          <Link href={`/dashboard/workspace`}>
+            <h2>Workspace</h2>
+          </Link>
         </div>
       </div>
       <div className="absolute bottom-8 w-[80%]">
