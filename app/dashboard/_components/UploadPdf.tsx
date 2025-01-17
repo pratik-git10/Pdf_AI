@@ -48,6 +48,10 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
   };
 
   const onUpload = async () => {
+    if (!file || !fileName) {
+      toast.error("Please select a file and provide a file name.");
+      return;
+    }
     setLoading(true);
     try {
       // // Step 1: Get a short-lived upload URL
@@ -84,7 +88,11 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
       // console.log(embeddedResult);
       setLoading(false);
       setOpen(false);
+
       toast.success("File Uploaded Successfully.");
+
+      setFile(null);
+      setFileName("");
     } catch (error) {
       toast.error("Error while Uploading");
     } finally {
@@ -111,6 +119,7 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
                 <div className="mt-2">
                   <h1>Select PDF File</h1>
                   <Input
+                    required={true}
                     type="file"
                     accept="application/pdf"
                     className="w-52 mt-1"
@@ -120,6 +129,7 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
                 <div className="mt-3">
                   <label htmlFor="">File name*</label>
                   <Input
+                    required={true}
                     placeholder="file name"
                     className="mt-1"
                     onChange={(e) => setFileName(e.target.value)}
@@ -138,7 +148,7 @@ const UploadPdf: React.FC<UploadPdfProps> = ({ children }) => {
               </Button>
             </DialogClose>
             <Button
-              disabled={loading}
+              disabled={loading || !file || !fileName}
               onClick={onUpload}
               className="flex gap-2">
               {loading ? (

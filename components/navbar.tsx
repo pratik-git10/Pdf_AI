@@ -9,7 +9,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ showLinkOnSmallDevices }) => {
   return (
-    <div className="flex justify-between items-center rounded-md border p-2 shadow-md shadow-slate-500">
+    <div className="flex justify-between items-center rounded-md border p-2 shadow-sm shadow-black">
       <Link href="/">
         <h2
           className={`text-2xl font-extrabold text-red-400 ${showLinkOnSmallDevices ? "block" : "md:hidden"}`}>

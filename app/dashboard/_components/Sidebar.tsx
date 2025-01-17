@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const Sidebar = () => {
   return (
-    <div className="shadow-md shadow-black h-screen px-4 py-2 ml-2 mr-2 rounded-md border-t">
+    <div className="shadow-sm shadow-black h-screen px-4 py-2 ml-2 mr-2 rounded-md border-t">
       <h2 className="text-2xl font-extrabold text-red-400 flex justify-center items-center">
         <Link href="/dashboard">PdfAI</Link>
       </h2>
@@ -19,12 +19,14 @@ const Sidebar = () => {
           </Button>
         </UploadPdf>
 
-        <div className="flex gap-2 items-center mt-5 p-2 hover:bg-slate-400 rounded-md cursor-pointer transition-all">
-          <Layout />
-          <Link href={`/dashboard/workspace`}>
+        {/* Harcoded url */}
+        <Link href={`/workspace/3b0bc94f-268c-48d9-bdd8-9b04dbdac8c2`}>
+          <div className="flex gap-2 items-center mt-5 p-2 hover:bg-slate-400 rounded-md cursor-pointer transition-all">
+            <Layout />
+
             <h2>Workspace</h2>
-          </Link>
-        </div>
+          </div>
+        </Link>
       </div>
       <div className="absolute bottom-8 w-[80%]">
         <div className="flex gap-2 items-center p-2 mt-2 bg-neutral-200 hover:bg-neutral-400 rounded-md cursor-pointer transition-all mb-4">
