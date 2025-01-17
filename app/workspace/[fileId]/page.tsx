@@ -28,7 +28,7 @@ const Workspace = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="m-2">
+      <div className="mx-8 my-2">
         <Navbar showLinkOnSmallDevices={true} />
       </div>
 

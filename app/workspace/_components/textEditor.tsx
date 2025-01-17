@@ -41,7 +41,7 @@ const TextEditor = () => {
   return (
     <div className="p-4 bg--500">
       <EditorExtension editor={editor} />
-      <div className="editor-content mb-5 mx-2 shadow-black shadow-sm rounded-md p-4 bg--300 mt-5">
+      <div className="editor-content mb-5 mx-2 p-4 bg--300 mt-5">
         <EditorContent editor={editor} className="h-full overflow-auto" />
       </div>
     </div>

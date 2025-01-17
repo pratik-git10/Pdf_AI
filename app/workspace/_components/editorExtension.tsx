@@ -7,27 +7,91 @@ import {
   AlignRight,
   AlignCenter,
   AlignLeft,
-  Blocks,
-  EllipsisVertical,
   Highlighter,
+  WandSparkles,
+  Heading1,
+  Heading2,
+  Heading3,
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { Editor } from "@tiptap/react";
+import { useAction, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useParams } from "next/navigation";
+import { chatSession } from "@/configs/AiModel";
+import toast from "react-hot-toast";
 
 interface EditorExtensionProps {
   editor: Editor | null;
 }
 
 const EditorExtension: React.FC<EditorExtensionProps> = ({ editor }) => {
+  // const fileInfo = useQuery(api.messages.getFileRecord, {
+  //   fileId: fileIdString,
+  // });
   if (!editor) {
     return null;
   }
+
+  const { fileId } = useParams();
+  const [loading, setLoading] = useState(false);
+  const fileIdString = Array.isArray(fileId) ? fileId[0] : fileId || "";
+
+  const searchAi = useAction(api.myActions.search);
 
   const toggleUnderline = () => {
     if (editor.isActive("underline")) {
       editor.chain().focus().unsetUnderline().run();
     } else {
       editor.chain().focus().setUnderline().run();
+    }
+  };
+
+  const onAiClick = async () => {
+    toast("Event has been created.");
+    setLoading(true);
+    try {
+      const selectedText = editor.state.doc.textBetween(
+        editor.state.selection.from,
+        editor.state.selection.to,
+        " "
+      );
+      console.log(selectedText);
+      const result = await searchAi({
+        query: selectedText,
+        fileId: fileIdString,
+      });
+
+      interface SearchResultItem {
+        pageContent: string;
+      }
+
+      const unformattedAns: SearchResultItem[] = JSON.parse(result);
+      // console.log("unformated answer", result);
+      let answer = " ";
+      unformattedAns &&
+        unformattedAns.forEach((item) => {
+          answer = answer + item.pageContent;
+        });
+
+      const PROMPT = `For question:${selectedText} and with the given content as answer, please give appropriate answer in HTML format only dont give extra. The answer content is ${answer}`;
+
+      const AIResult = await chatSession.sendMessage(PROMPT);
+      // //  console.log(AIResult.response.text());
+      const finalAnswer = AIResult.response
+        .text()
+
+        .replace("```", "")
+        .replace("html", "")
+        .replace("```", "");
+      const allText = editor.getHTML();
+      editor.commands.setContent(
+        allText + `<p> <strong>Answer: </strong>${finalAnswer}</p>`
+      );
+    } catch (error) {
+      console.log("ai error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,11 +116,7 @@ const EditorExtension: React.FC<EditorExtensionProps> = ({ editor }) => {
             className={editor.isActive("underline") ? "text-blue-500" : ""}>
             <Underline />
           </button>
-          <button
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={editor.isActive("bulletList") ? "text-blue-500" : ""}>
-            <EllipsisVertical />
-          </button>
+
           <button
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 1 }).run()
@@ -64,7 +124,7 @@ const EditorExtension: React.FC<EditorExtensionProps> = ({ editor }) => {
             className={
               editor.isActive("heading", { level: 1 }) ? "text-blue-500" : ""
             }>
-            H1
+            <Heading1 />
           </button>
           <button
             onClick={() =>
@@ -73,7 +133,7 @@ const EditorExtension: React.FC<EditorExtensionProps> = ({ editor }) => {
             className={
               editor.isActive("heading", { level: 2 }) ? "text-blue-500" : ""
             }>
-            H2
+            <Heading2 />
           </button>
           <button
             onClick={() =>
@@ -82,7 +142,7 @@ const EditorExtension: React.FC<EditorExtensionProps> = ({ editor }) => {
             className={
               editor.isActive("heading", { level: 3 }) ? "text-blue-500" : ""
             }>
-            H3
+            <Heading3 />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
@@ -121,6 +181,9 @@ const EditorExtension: React.FC<EditorExtensionProps> = ({ editor }) => {
             onClick={() => editor.chain().focus().toggleHighlight().run()}
             className={editor.isActive("highlight") ? "text-blue-600" : ""}>
             <Highlighter />
+          </button>
+          <button onClick={() => onAiClick()} className={"hover:text-blue-500"}>
+            <WandSparkles />
           </button>
         </div>
       </div>

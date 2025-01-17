@@ -8,6 +8,8 @@ interface PdfViewerProps {
 
 const PdfViewer: React.FC<PdfViewerProps> = ({ fileUrl }) => {
   const [loading, setLoading] = useState(true);
+  const [showToolbar, setShowToolbar] = useState(false);
+  const [key, setKey] = useState(0);
 
   useEffect(() => {
     // Reset loading state when the fileUrl changes
@@ -22,26 +24,44 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ fileUrl }) => {
     setLoading(false);
   };
 
+  const toggleToolbar = () => {
+    setShowToolbar(!showToolbar);
+    setKey((prevKey) => prevKey + 1);
+  };
+
   return (
-    <div className="shadow-sm bg--400 shadow-black rounded-md p-1 my-5">
+    <>
+      {/* <div className="shadow-sm bg--400 shadow-black rounded-md p-1 my-5"> */}
       {loading ? (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center h-screen">
           <p className="flex gap-2">
             <Loader2Icon className="animate-spin" />
             Loading...
           </p>
         </div>
       ) : null}
+
+      {fileUrl && !loading && (
+        <div className="mb-2 flex justify-center">
+          <button
+            onClick={toggleToolbar}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded">
+            {showToolbar ? "Hide Toolbar" : "Show Toolbar"}
+          </button>
+        </div>
+      )}
+
       {fileUrl && (
         <iframe
-          src={`${fileUrl}#toolbar=0`}
+          key={key}
+          src={`${fileUrl}${showToolbar ? "" : "#toolbar=0"}`}
           height="90vh"
           width="100%"
           className={`h-[90vh] my-2 ${loading ? "hidden" : ""}`}
           onLoad={handleLoad}
         />
       )}
-    </div>
+    </>
   );
 };
 
