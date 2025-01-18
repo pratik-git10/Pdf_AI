@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import BulletList from "@tiptap/extension-bullet-list";
@@ -10,8 +10,19 @@ import ListItem from "@tiptap/extension-list-item";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
 import EditorExtension from "./editorExtension";
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
+import { useParams } from "next/navigation";
 
 const TextEditor = () => {
+  const { fileId } = useParams();
+
+  const fileIdString = Array.isArray(fileId) ? fileId[0] : fileId || "";
+
+  const getnewNotes = useQuery(api.notes.getNotes, { fileId: fileIdString });
+
+  //console.log(getnewNotes);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -37,6 +48,12 @@ const TextEditor = () => {
       },
     },
   });
+
+  useEffect(() => {
+    if (editor && getnewNotes) {
+      editor.commands.setContent(getnewNotes);
+    }
+  }, [getnewNotes && editor]);
 
   return (
     <div className="p-4 bg--500">

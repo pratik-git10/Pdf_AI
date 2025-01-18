@@ -28,8 +28,8 @@ export async function GET(req: Request) {
     });
 
     const splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 150,
-      chunkOverlap: 30,
+      chunkSize: 100,
+      chunkOverlap: 20,
     });
 
     const output = await splitter.createDocuments([pdfTextContent]);

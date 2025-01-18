@@ -28,6 +28,11 @@ const Workspace = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
+      <p className="scrolling-text flex justify-center items-center font-bold my-1 bg-red-200 p-1">
+        This Page still in Development, It have Several issues in AI part.
+        Please Contact if Serious problem Occur!
+      </p>
+
       <div className="mx-8 my-2">
         <Navbar showLinkOnSmallDevices={true} />
       </div>

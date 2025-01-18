@@ -13,13 +13,14 @@ import {
   Heading2,
   Heading3,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Editor } from "@tiptap/react";
-import { useAction, useQuery } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useParams } from "next/navigation";
 import { chatSession } from "@/configs/AiModel";
 import toast from "react-hot-toast";
+import { useUser } from "@clerk/nextjs";
 
 interface EditorExtensionProps {
   editor: Editor | null;
@@ -38,7 +39,8 @@ const EditorExtension: React.FC<EditorExtensionProps> = ({ editor }) => {
   const fileIdString = Array.isArray(fileId) ? fileId[0] : fileId || "";
 
   const searchAi = useAction(api.myActions.search);
-
+  const addNotes = useMutation(api.notes.AddNotes);
+  const { user } = useUser();
   const toggleUnderline = () => {
     if (editor.isActive("underline")) {
       editor.chain().focus().unsetUnderline().run();
@@ -48,7 +50,8 @@ const EditorExtension: React.FC<EditorExtensionProps> = ({ editor }) => {
   };
 
   const onAiClick = async () => {
-    toast("Event has been created.");
+    toast.success("Ai is generating...");
+
     setLoading(true);
     try {
       const selectedText = editor.state.doc.textBetween(
@@ -88,12 +91,34 @@ const EditorExtension: React.FC<EditorExtensionProps> = ({ editor }) => {
       editor.commands.setContent(
         allText + `<p> <strong>Answer: </strong>${finalAnswer}</p>`
       );
+      addNotes({
+        notes: editor.getHTML(),
+        fileId: fileIdString,
+        createdBy: user?.primaryEmailAddress?.emailAddress || "undefined",
+      });
     } catch (error) {
       console.log("ai error");
+      toast.error("Something went wrong in AI.");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === "Enter") {
+        // Call onAiClick when Ctrl + Enter is pressed
+        onAiClick();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeydown);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, []);
 
   return (
     <div className=" rounded-md shadow-sm shadow-black p-2 mb-2">
